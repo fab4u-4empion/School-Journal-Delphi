@@ -60,7 +60,7 @@ object AddClassForm: TAddClassForm
   end
   object Label4: TLabel
     Left = 8
-    Top = 110
+    Top = 111
     Width = 370
     Height = 23
     Alignment = taCenter
@@ -455,8 +455,8 @@ object AddClassForm: TAddClassForm
   end
   object AddClassBtn: TButton
     Left = 8
-    Top = 399
-    Width = 370
+    Top = 397
+    Width = 372
     Height = 43
     Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1082#1083#1072#1089#1089
     Font.Charset = RUSSIAN_CHARSET

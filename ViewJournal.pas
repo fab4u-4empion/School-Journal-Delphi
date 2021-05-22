@@ -8,41 +8,42 @@ uses
   Vcl.StdCtrls, Vcl.Grids, Vcl.Menus, System.Generics.Collections, Student, Lesson, Note;
 
 type
-  TViewJournalForm = class(TForm)
-    StudentsSTRG: TStringGrid;
-    Label1: TLabel;
-    Label3: TLabel;
-    Label2: TLabel;
-    LessonLabel: TLabel;
-    ClassNameLabel: TLabel;
-    Label4: TLabel;
-    QuaterLabel: TLabel;
-    IsNotUnderStudy: TLabel;
-    procedure FormShow(Sender: TObject);
-    procedure GetStudents;
-    procedure GetLessons;
-    procedure GetNotes;
-    procedure UpdateSTRGNotes;
-    function CheckLesson: Boolean;
-    procedure FillStudentStrg;
-    procedure UpdateSTRGLesson;
-    procedure UpdateSTRG;
-    procedure UpdateSTRGQuaterNotes;
-    function FindLesson(ID: Int64): Integer;
-    function FindStudent(ID: Int64): Integer;
-    procedure StudentsSTRGDrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
-    procedure StudentsSTRGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
-  private
-    StudentList: TList<TStudent>;
-    LessonsList: TList<TLesson>;
-    NotesList: TList<TNote>;
-  public
-    Journal: TJournal;
-  end;
+    TViewJournalForm = class(TForm)
+        StudentsSTRG: TStringGrid;
+        Label1: TLabel;
+        Label3: TLabel;
+        Label2: TLabel;
+        LessonLabel: TLabel;
+        ClassNameLabel: TLabel;
+        Label4: TLabel;
+        QuaterLabel: TLabel;
+        IsNotUnderStudy: TLabel;
+        procedure FormShow(Sender: TObject);
+        procedure GetStudents;
+        procedure GetLessons;
+        procedure GetNotes;
+        procedure UpdateSTRGNotes;
+        function CheckLesson: Boolean;
+        procedure FillStudentStrg;
+        procedure UpdateSTRGLesson;
+        procedure UpdateSTRG;
+        procedure UpdateSTRGQuaterNotes;
+        function FindLesson(ID: Int64): Integer;
+        function FindStudent(ID: Int64): Integer;
+        procedure ImportJournal();
+        procedure StudentsSTRGDrawCell(Sender: TObject; ACol, ARow: Integer;
+          Rect: TRect; State: TGridDrawState);
+        procedure StudentsSTRGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+    private
+        StudentList: TList<TStudent>;
+        LessonsList: TList<TLesson>;
+        NotesList: TList<TNote>;
+    public
+        Journal: TJournal;
+    end;
 
 var
-  ViewJournalForm: TViewJournalForm;
+    ViewJournalForm: TViewJournalForm;
 
 implementation
 
@@ -262,30 +263,35 @@ begin
     CloseFile(NoteFile);
 end;
 
-procedure TViewJournalForm.FormShow(Sender: TObject);
+procedure TViewJournalForm.ImportJournal;
 begin
-    Self.Caption := Self.Caption + ' ' + Journal.GetClassName + '. ' + Journal.GetLesson + '.';
-    ClassNameLabel.Caption := Journal.GetClassName;
-    LessonLabel.Caption := Journal.GetLesson;
-    QuaterLabel.Caption := Journal.GetQuater;
     GetStudents;
     GetLessons;
     GetNotes;
     if NotesList.Count > 0 then
         UpdateSTRGNotes;
     StudentsStrg.ColCount := 5 + LessonsList.Count;
-    StudentsStrg.Cells[0, 0] := 'Фамилия';
-    StudentsStrg.Cells[1, 0] := 'Имя';
-    StudentsStrg.Cells[2, 0] := 'Пропуски';
-    StudentsStrg.Cells[3, 0] := 'Средний' + #13#10 + 'балл';
-    StudentsStrg.Cells[4, 0] := 'Четвертная' + #13#10 + 'оценка';
-    StudentsStrg.FixedCols := 4;
     if CheckLesson then
         IsNotUnderStudy.Visible := false;
     FillStudentSTRG;
     UpdateSTRGLesson;
     UpdateSTRG;
     UpdateSTRGQuaterNotes;
+end;
+
+procedure TViewJournalForm.FormShow(Sender: TObject);
+begin
+    Self.Caption := Self.Caption + ' ' + Journal.GetClassName + '. ' + Journal.GetLesson + '.';
+    ClassNameLabel.Caption := Journal.GetClassName;
+    LessonLabel.Caption := Journal.GetLesson;
+    QuaterLabel.Caption := Journal.GetQuater;
+    ImportJournal;
+    StudentsStrg.Cells[0, 0] := 'Фамилия';
+    StudentsStrg.Cells[1, 0] := 'Имя';
+    StudentsStrg.Cells[2, 0] := 'Пропуски';
+    StudentsStrg.Cells[3, 0] := 'Средний' + #13#10 + 'балл';
+    StudentsStrg.Cells[4, 0] := 'Четвертная' + #13#10 + 'оценка';
+    StudentsStrg.FixedCols := 4;
 end;
 
 end.

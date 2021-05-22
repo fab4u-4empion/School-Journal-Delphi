@@ -45,8 +45,11 @@ end;
 procedure TSelectClassToEditForm.EditClassBtnClick(Sender: TObject);
 var
     IsCorrect: Boolean;
+    LessonsFile: TextFile;
+    flag: Boolean;
 begin
     IsCorrect := true;
+    flag := true;
     if ClassesCBOX.Text = '' then
     begin
         MessageBox(Application.Handle, 'Вы не выбрали класс для редактирования.', 'Редактирование класса', MB_ICONERROR);
@@ -61,10 +64,24 @@ begin
     begin
         EditClassForm := TEditClassForm.Create(Self);
         EditClassForm.ClassName := ClassesCBOX.Text;
-        Self.Hide;
-        EditClassForm.ShowModal;
-        EditClassForm.Destroy;
-        Self.Show;
+        try
+            AssignFile(LessonsFile, 'common/classes/' + ClassesCBOX.Text + '/lessons.lessons');
+            reset(lessonsfile);
+            closefile(LessonsFile);
+            AssignFile(LessonsFile, 'common/classes/' + ClassesCBOX.Text + '/students.students');
+            reset(lessonsfile);
+            closefile(LessonsFile)
+        except
+            flag := false;
+            MessageBox(Application.Handle, 'Не удается получить доступ к файлам класса.', 'Редактирование класса', MB_ICONERROR);
+        end;
+        if flag then
+        begin
+            Self.Hide;
+            EditClassForm.ShowModal;
+            EditClassForm.Destroy;
+            Self.Show;
+        end;
         ClassesCBOX.Items.Clear;
         ClassesCBOX.Text := '';
         FillCBOX;

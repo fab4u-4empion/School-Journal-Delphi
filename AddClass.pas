@@ -46,7 +46,7 @@ type
     procedure ClassLetterEditKeyPress(Sender: TObject; var Key: Char);
     procedure ClassLetterEditChange(Sender: TObject);
     procedure AddClassBtnClick(Sender: TObject);
-    procedure MakeDir;
+    function MakeDir: Boolean;
     procedure MakeClassLessonsFile;
     procedure MakeClassStudentsFile;
     procedure MakeClassJournal;
@@ -55,7 +55,7 @@ type
   private
     { Private declarations }
   public
-    { Public declarations }
+    ClassName: String;
   end;
 
 var
@@ -69,7 +69,7 @@ const
     ClassLetterPattern = '^[А-Яа-я]$';
     HELP = 'Добавление класса.'#13#10#13#10'Для добавления класса нужно указать его номер (число от 1 до 11), буквенное обозначение (любая буква русского алфавита), указать хотя бы один изучаемый предмет.'#13#10#13#10'';
 
-procedure TAddClassForm.MakeDir();
+function TAddClassForm.MakeDir(): Boolean;
 var
     ClassDir: String;
     LetterNumber: String;
@@ -78,9 +78,15 @@ begin
     LetterNumber := LetterNumber.ToUpper;
     ClassDir := IntToStr(NumberOfClassEdit.Value) + ' ' +  LetterNumber;
     if not DirectoryExists('common/classes/' + ClassDir) then
-        CreateDir('common/classes/' + ClassDir)
+    begin
+        CreateDir('common/classes/' + ClassDir);
+        Result := true;
+    end
     else
-        MessageBox(Application.Handle, 'Класс уже существует.', 'Добавление класса', MB_ICONERROR);
+    begin
+        MessageBox(Application.Handle, 'Класс уже существует.', 'Добавление класса', MB_ICONINFORMATION);
+        Result := false;
+    end;
 end;
 
 procedure TAddClassForm.HelpBTNClick(Sender: TObject);
@@ -191,14 +197,21 @@ begin
 end;
 
 procedure TAddClassForm.AddClassBtnClick(Sender: TObject);
+var
+    LetterNumber: String;
 begin
     if DataValidation then
     begin
-         MakeDir;
-         MakeClassLessonsFile;
-         MakeClassStudentsFile;
-         MakeClassJournal;
-         MessageBox(Application.Handle, 'Класс успешно создан.', 'Добавление класса', MB_ICONINFORMATION);
+         if MakeDir then
+         begin
+             MakeClassLessonsFile;
+             MakeClassStudentsFile;
+             MakeClassJournal;
+             MessageBox(Application.Handle, 'Класс успешно создан.', 'Добавление класса', MB_ICONINFORMATION);
+         end;
+         LetterNumber := ClassLetterEdit.Text;
+         LetterNumber := LetterNumber.ToUpper;
+         Self.ClassName := IntToStr(NumberOfClassEdit.Value) + ' ' +  LetterNumber;
          Self.Close;
     end;
 end;

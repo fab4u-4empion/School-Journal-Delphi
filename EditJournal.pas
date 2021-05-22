@@ -3,60 +3,61 @@ unit EditJournal;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, JournalInfo, Vcl.Menus, Vcl.StdCtrls,
-  Vcl.Grids, System.Generics.Collections, Student, AddLesson, Lesson, System.Generics.Defaults, Note,
-  DateUtils;
+    Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+    Vcl.Controls, Vcl.Forms, Vcl.Dialogs, JournalInfo, Vcl.Menus, Vcl.StdCtrls,
+    Vcl.Grids, System.Generics.Collections, Student, AddLesson, Lesson, System.Generics.Defaults, Note,
+    DateUtils;
 
 type
-  TEditJournalForm = class(TForm)
-    Label1: TLabel;
-    MainMenu1: TMainMenu;
-    HelpBTN: TMenuItem;
-    Label3: TLabel;
-    Label2: TLabel;
-    LessonLabel: TLabel;
-    ClassNameLabel: TLabel;
-    Label4: TLabel;
-    QuaterLabel: TLabel;
-    StudentsSTRG: TStringGrid;
-    IsNotUnderStudy: TLabel;
-    AddLessonBTN: TMenuItem;
-    SaveJournalBTN: TMenuItem;
-    procedure FormShow(Sender: TObject);
-    procedure GetStudents;
-    procedure FillStudentStrg;
-    function CheckLesson: Boolean;
-    procedure AddLessonBTNClick(Sender: TObject);
-    procedure GetLessons;
-    procedure GetNotes;
-    procedure SaveJournalBTNClick(Sender: TObject);
-    procedure UpdateSTRGLesson;
-    procedure UpdateSTRG;
-    procedure UpdateSTRGNotes;
-    procedure UpdateNotesList;
-    procedure UpdateSTRGQuaterNotes;
-    function FindLesson(ID: Int64): Integer;
-    function FindStudent(ID: Int64): Integer;
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure StudentsSTRGKeyPress(Sender: TObject; var Key: Char);
-    procedure StudentsSTRGSetEditText(Sender: TObject; ACol, ARow: Integer;
-      const Value: string);
-    procedure StudentsSTRGDrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
-    procedure StudentsSTRGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
-    procedure HelpBTNClick(Sender: TObject);
-  private
-    StudentList: TList<TStudent>;
-    LessonsList: TList<TLesson>;
-    NotesList: TList<TNote>;
-    NeedSave: Boolean;
-  public
-    Journal: TJournal;
-  end;
+    TEditJournalForm = class(TForm)
+        Label1: TLabel;
+        MainMenu1: TMainMenu;
+        HelpBTN: TMenuItem;
+        Label3: TLabel;
+        Label2: TLabel;
+        LessonLabel: TLabel;
+        ClassNameLabel: TLabel;
+        Label4: TLabel;
+        QuaterLabel: TLabel;
+        StudentsSTRG: TStringGrid;
+        IsNotUnderStudy: TLabel;
+        AddLessonBTN: TMenuItem;
+        SaveJournalBTN: TMenuItem;
+        procedure FormShow(Sender: TObject);
+        procedure GetStudents;
+        procedure FillStudentStrg;
+        function CheckLesson: Boolean;
+        procedure AddLessonBTNClick(Sender: TObject);
+        procedure GetLessons;
+        procedure GetNotes;
+        procedure SaveJournalBTNClick(Sender: TObject);
+        procedure UpdateSTRGLesson;
+        procedure UpdateSTRG;
+        procedure UpdateSTRGNotes;
+        procedure UpdateNotesList;
+        procedure UpdateSTRGQuaterNotes;
+        function FindLesson(ID: Int64): Integer;
+        function FindStudent(ID: Int64): Integer;
+        procedure ImportJournal;
+        procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+        procedure StudentsSTRGKeyPress(Sender: TObject; var Key: Char);
+        procedure StudentsSTRGSetEditText(Sender: TObject; ACol, ARow: Integer;
+          const Value: string);
+        procedure StudentsSTRGDrawCell(Sender: TObject; ACol, ARow: Integer;
+          Rect: TRect; State: TGridDrawState);
+        procedure StudentsSTRGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+        procedure HelpBTNClick(Sender: TObject);
+    private
+        StudentList: TList<TStudent>;
+        LessonsList: TList<TLesson>;
+        NotesList: TList<TNote>;
+        NeedSave: Boolean;
+    public
+        Journal: TJournal;
+    end;
 
 var
-  EditJournalForm: TEditJournalForm;
+    EditJournalForm: TEditJournalForm;
 
 implementation
 
@@ -199,37 +200,48 @@ var
     Note: TNote;
     I, J: Integer;
 begin
-    AssignFile(LessonsFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/lessons.lessons');
-    rewrite(LessonsFile);
-    for Lesson in LessonsList do
-        write(LessonsFile, Lesson);
-    CloseFile(LessonsFile);
+    try
+        AssignFile(LessonsFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/lessons.lessons');
+        rewrite(LessonsFile);
+        for Lesson in LessonsList do
+            write(LessonsFile, Lesson);
+        CloseFile(LessonsFile);
+    except
+        MessageBox(Application.Handle, 'Не удается получить доступ к файлу с уроками. Данные сохранены не будут.', 'Редактирование класса', MB_ICONERROR);
+    end;
 
-    AssignFile(NoteFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/notes.notes');
-    rewrite(NoteFile);
-    for I := 1 to StudentsSTRG.RowCount - 1 do
-        for J := 5 to StudentsStrg.ColCount - 1 do
-            if StudentsSTRG.Cells[J, I] <> '' then
+    try
+        AssignFile(NoteFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/notes.notes');
+        rewrite(NoteFile);
+        for I := 1 to StudentsSTRG.RowCount - 1 do
+            for J := 5 to StudentsStrg.ColCount - 1 do
+                if StudentsSTRG.Cells[J, I] <> '' then
+                begin
+                    Note.SetNote(StudentsSTRG.Cells[J, I]);
+                    Note.SetStudenID(StudentList[I - 1].GetID);
+                    Note.SetLessonID(LessonsList[J -5].GetID);
+                    write(NoteFile, Note);
+                end;
+        CloseFile(NoteFile);
+    except
+          MessageBox(Application.Handle, 'Не удается получить доступ к файлу с оценками. Данные сохранены не будут.', 'Редактирование класса', MB_ICONERROR);
+    end;
+
+    try
+        AssignFile(NoteFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/quater.notes');
+        rewrite(NoteFile);
+        for I := 1 to StudentsSTRG.RowCount - 1 do
+            if StudentsSTRG.Cells[4, I] <> '' then
             begin
-                Note.SetNote(StudentsSTRG.Cells[J, I]);
+                Note.SetNote(StudentsSTRG.Cells[4, I]);
                 Note.SetStudenID(StudentList[I - 1].GetID);
-                Note.SetLessonID(LessonsList[J -5].GetID);
+                Note.SetLessonID(DateTimeToUnix(Now));
                 write(NoteFile, Note);
             end;
-    CloseFile(NoteFile);
-
-    AssignFile(NoteFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/quater.notes');
-    rewrite(NoteFile);
-    for I := 1 to StudentsSTRG.RowCount - 1 do
-        if StudentsSTRG.Cells[4, I] <> '' then
-        begin
-            Note.SetNote(StudentsSTRG.Cells[4, I]);
-            Note.SetStudenID(StudentList[I - 1].GetID);
-            Note.SetLessonID(DateTimeToUnix(Now));
-            write(NoteFile, Note);
-        end;
-    CloseFile(NoteFile);
-
+        CloseFile(NoteFile);
+    except
+        MessageBox(Application.Handle, 'Не удается получить доступ к файлу с четветными оценками. Данные сохранены не будут.', 'Редактирование класса', MB_ICONERROR);
+    end;
     NeedSave := false;
     MessageBox(Application.Handle, 'Информация сохранена.', 'Редактирование журнала', MB_ICONINFORMATION);
 end;
@@ -439,6 +451,23 @@ begin
         CanClose := true;
 end;
 
+procedure TEditJournalForm.ImportJournal;
+begin
+    GetStudents;
+    GetLessons;
+    GetNotes;
+    if NotesList.Count > 0 then
+        UpdateSTRGNotes;
+    StudentsStrg.ColCount := 5 + LessonsList.Count;
+    if CheckLesson then
+        IsNotUnderStudy.Visible := false;
+    FillStudentSTRG;
+    UpdateSTRGLesson;
+    UpdateSTRG;
+    UpdateSTRGQuaterNotes;
+    NeedSave := false;
+end;
+
 procedure TEditJournalForm.FormShow(Sender: TObject);
 begin
     Comparer := TDelegatedComparer<TLesson>.Create(
@@ -455,25 +484,13 @@ begin
     ClassNameLabel.Caption := Journal.GetClassName;
     LessonLabel.Caption := Journal.GetLesson;
     QuaterLabel.Caption := Journal.GetQuater;
-    GetStudents;
-    GetLessons;
-    GetNotes;
-    if NotesList.Count > 0 then
-        UpdateSTRGNotes;
-    StudentsStrg.ColCount := 5 + LessonsList.Count;
+    ImportJournal;
     StudentsStrg.Cells[0, 0] := 'Фамилия';
     StudentsStrg.Cells[1, 0] := 'Имя';
     StudentsStrg.Cells[2, 0] := 'Пропуски';
     StudentsStrg.Cells[3, 0] := 'Средний' + #13#10 + 'балл';
     StudentsStrg.Cells[4, 0] := 'Четвертная' + #13#10 + 'оценка';
     StudentsStrg.FixedCols := 4;
-    if CheckLesson then
-        IsNotUnderStudy.Visible := false;
-    FillStudentSTRG;
-    UpdateSTRGLesson;
-    UpdateSTRG;
-    UpdateSTRGQuaterNotes;
-    NeedSave := false;
 end;
 
 end.

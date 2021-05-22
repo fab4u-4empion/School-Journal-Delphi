@@ -7,33 +7,33 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Menus, JournalInfo, ViewJournal, EditJournal;
 
 type
-  TSelectJournalForm = class(TForm)
-    Label1: TLabel;
-    Label3: TLabel;
-    ClassesCBOX: TComboBox;
-    Label2: TLabel;
-    LessonsCBOX: TComboBox;
-    SelectJournalBtn: TButton;
-    Label4: TLabel;
-    QuaterCBOX: TComboBox;
-    procedure FormShow(Sender: TObject);
-    procedure ClassesCBOXChange(Sender: TObject);
-    procedure LessonsCBOXChange(Sender: TObject);
-    procedure SelectJournalBtnClick(Sender: TObject);
-    procedure QuaterCBOXChange(Sender: TObject);
-    public procedure SelectJournalToView;
-    public procedure SelectJournalToEdit;
-    private procedure FillClassesCBOX;
-    private procedure FillQuaterCBOX;
-    private procedure FillLessonsCBOX;
-  private
+    TSelectJournalForm = class(TForm)
+        Label1: TLabel;
+        Label3: TLabel;
+        ClassesCBOX: TComboBox;
+        Label2: TLabel;
+        LessonsCBOX: TComboBox;
+        SelectJournalBtn: TButton;
+        Label4: TLabel;
+        QuaterCBOX: TComboBox;
+        procedure FormShow(Sender: TObject);
+        procedure ClassesCBOXChange(Sender: TObject);
+        procedure LessonsCBOXChange(Sender: TObject);
+        procedure SelectJournalBtnClick(Sender: TObject);
+        procedure QuaterCBOXChange(Sender: TObject);
+        public procedure SelectJournalToView;
+        public procedure SelectJournalToEdit;
+        private procedure FillClassesCBOX;
+        private procedure FillQuaterCBOX;
+        private procedure FillLessonsCBOX;
+    private
     Context: Byte;
-  public
+    public
     { Public declarations }
-  end;
+    end;
 
 var
-  SelectJournalForm: TSelectJournalForm;
+    SelectJournalForm: TSelectJournalForm;
 
 implementation
 
@@ -142,12 +142,34 @@ end;
 procedure TSelectJournalForm.SelectJournalBtnClick(Sender: TObject);
 var
     Journal: TJournal;
-    JournalFile, StudentsFile: TextFile;
+    JournalFile, StudentsFile, TestFile: TextFile;
+    Flag: Boolean;
 begin
+    Flag := true;
     Journal.SetClassName(ClassesCBOX.Text);
     Journal.SetLesson(LessonsCBOX.Text);
     Journal.SetQuater(QuaterCBOX.Text);
-    if Self.Context = EDIT then
+    try
+        AssignFile(TestFile, 'common/classes/' + Journal.GetClassName + '/lessons.lessons');
+        reset(TestFile);
+        closefile(TestFile);
+        AssignFile(TestFile, 'common/classes/' + Journal.GetClassName + '/students.students');
+        reset(TestFile);
+        closefile(TestFile);
+        AssignFile(TestFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/lessons.lessons');
+        reset(TestFile);
+        closefile(TestFile);
+        AssignFile(TestFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/notes.notes');
+        reset(TestFile);
+        closefile(TestFile);
+        AssignFile(TestFile, 'common/classes/' + Journal.GetClassName + '/journal/' + Journal.GetQuater + '/' + Journal.GetLesson + '/quater.notes');
+        reset(TestFile);
+        closefile(TestFile);
+    except
+        flag := false;
+        MessageBox(Application.Handle, 'Не удается получить доступ к файлам класса или журнала.', 'Выбор журнала', MB_ICONERROR);
+    end;
+    if (Self.Context = EDIT) and flag then
     begin
         EditJournalForm := TEditJournalForm.Create(Self);
         EditJournalForm.Journal := Journal;
@@ -168,7 +190,7 @@ begin
         end;
     end
     else
-    if Self.Context = VIEW then
+    if (Self.Context = VIEW) and flag then
     begin
         ViewJournalForm := TViewJournalForm.Create(Self);
         ViewJournalForm.Journal := Journal;

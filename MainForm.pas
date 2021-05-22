@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, AddClass, SelectClassToEdit,
   Vcl.Menus, SelectJournal, System.Generics.Collections, Vcl.Imaging.pngimage,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, EditClass;
 
 type
   TBaseForm = class(TForm)
@@ -17,6 +17,7 @@ type
     MainMenu1: TMainMenu;
     HelpBTN: TMenuItem;
     Image1: TImage;
+    N1: TMenuItem;
     procedure AddClassClick(Sender: TObject);
     procedure ViewJournalClick(Sender: TObject);
     procedure EditJournalClick(Sender: TObject);
@@ -24,6 +25,7 @@ type
     procedure EditClassClick(Sender: TObject);
     procedure CheckClasses;
     procedure HelpBTNClick(Sender: TObject);
+    procedure N1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -49,10 +51,20 @@ begin
 end;
 
 procedure TBaseForm.AddClassClick(Sender: TObject);
+var
+    ClassName: String;
 begin
     AddClassForm := TAddClassForm.Create(Self);
     AddClassForm.ShowModal;
+    ClassName := AddClassForm.ClassName;
     AddClassForm.Destroy;
+    if ClassName <> '' then
+    begin
+        EditClassForm := TEditClassForm.Create(Self);
+        EditClassForm.ClassName := ClassName;
+        EditClassForm.ShowModal;
+        EditClassForm.Destroy;
+    end;
     CheckClasses;
 end;
 
@@ -107,6 +119,11 @@ end;
 procedure TBaseForm.HelpBTNClick(Sender: TObject);
 begin
     MessageBox(Application.Handle, HELP, 'Справка', MB_ICONINFORMATION);
+end;
+
+procedure TBaseForm.N1Click(Sender: TObject);
+begin
+    MessageBox(Application.Handle, 'Данная программа разработана студентом БГУИР группы 051007 Сакуном Иваном Юрьевичем в рамках курсового проекта.', 'Об авторе', MB_ICONINFORMATION);
 end;
 
 procedure TBaseForm.ViewJournalClick(Sender: TObject);

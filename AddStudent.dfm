@@ -90,7 +90,7 @@ object AddStudentForm: TAddStudentForm
   end
   object AddStudentBtn: TButton
     Left = 8
-    Top = 114
+    Top = 115
     Width = 380
     Height = 43
     Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1091#1095#1077#1085#1080#1082#1072

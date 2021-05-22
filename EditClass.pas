@@ -8,70 +8,70 @@ uses
   AddStudent, ViewStudentList, System.Generics.Defaults, DeleteStudent;
 
 type
-  TEditClassForm = class(TForm)
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    MainMenu1: TMainMenu;
-    HelpBTN: TMenuItem;
-    ClassNameLabel: TLabel;
-    Label4: TLabel;
-    ScrollBox: TScrollBox;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
-    CheckBox4: TCheckBox;
-    CheckBox5: TCheckBox;
-    CheckBox6: TCheckBox;
-    CheckBox7: TCheckBox;
-    CheckBox8: TCheckBox;
-    CheckBox9: TCheckBox;
-    CheckBox10: TCheckBox;
-    CheckBox11: TCheckBox;
-    CheckBox12: TCheckBox;
-    CheckBox13: TCheckBox;
-    CheckBox14: TCheckBox;
-    CheckBox15: TCheckBox;
-    CheckBox16: TCheckBox;
-    CheckBox17: TCheckBox;
-    CheckBox18: TCheckBox;
-    CheckBox19: TCheckBox;
-    CheckBox20: TCheckBox;
-    CheckBox21: TCheckBox;
-    CheckBox22: TCheckBox;
-    CheckBox23: TCheckBox;
-    CheckBox24: TCheckBox;
-    SaveClassBtn: TButton;
-    DeleteClass: TMenuItem;
-    N2: TMenuItem;
-    AddStudentBTN: TMenuItem;
-    DeleteStudentBTN: TMenuItem;
-    ListOfStudentsBTN: TMenuItem;
-    procedure FormShow(Sender: TObject);
-    procedure FillLessonsList();
-    procedure CheckLessons;
-    procedure CheckBoxClick(Sender: TObject);
-    procedure SaveClassBtnClick(Sender: TObject);
-    procedure SaveClass();
-    procedure DeleteClassInfo;
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure DeleteClassClick(Sender: TObject);
-    procedure ListOfStudentsBTNClick(Sender: TObject);
-    procedure DeleteStudentBTNClick(Sender: TObject);
-    procedure AddStudentBTNClick(Sender: TObject);
-    procedure FillStudentList;
-    procedure UpdateJournal;
-    procedure HelpBTNClick(Sender: TObject);
-  private
-    LessonsList: TList<String>;
-    NeedSave: Boolean;
-    StudentList: TList<TStudent>;
-  public
-    ClassName: String;
-  end;
+    TEditClassForm = class(TForm)
+        Label1: TLabel;
+        Label2: TLabel;
+        Label3: TLabel;
+        MainMenu1: TMainMenu;
+        HelpBTN: TMenuItem;
+        ClassNameLabel: TLabel;
+        Label4: TLabel;
+        ScrollBox: TScrollBox;
+        CheckBox1: TCheckBox;
+        CheckBox2: TCheckBox;
+        CheckBox3: TCheckBox;
+        CheckBox4: TCheckBox;
+        CheckBox5: TCheckBox;
+        CheckBox6: TCheckBox;
+        CheckBox7: TCheckBox;
+        CheckBox8: TCheckBox;
+        CheckBox9: TCheckBox;
+        CheckBox10: TCheckBox;
+        CheckBox11: TCheckBox;
+        CheckBox12: TCheckBox;
+        CheckBox13: TCheckBox;
+        CheckBox14: TCheckBox;
+        CheckBox15: TCheckBox;
+        CheckBox16: TCheckBox;
+        CheckBox17: TCheckBox;
+        CheckBox18: TCheckBox;
+        CheckBox19: TCheckBox;
+        CheckBox20: TCheckBox;
+        CheckBox21: TCheckBox;
+        CheckBox22: TCheckBox;
+        CheckBox23: TCheckBox;
+        CheckBox24: TCheckBox;
+        SaveClassBtn: TButton;
+        DeleteClass: TMenuItem;
+        N2: TMenuItem;
+        AddStudentBTN: TMenuItem;
+        DeleteStudentBTN: TMenuItem;
+        ListOfStudentsBTN: TMenuItem;
+        procedure FormShow(Sender: TObject);
+        procedure FillLessonsList();
+        procedure CheckLessons;
+        procedure CheckBoxClick(Sender: TObject);
+        procedure SaveClassBtnClick(Sender: TObject);
+        procedure SaveClass();
+        procedure DeleteClassInfo;
+        procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+        procedure DeleteClassClick(Sender: TObject);
+        procedure ListOfStudentsBTNClick(Sender: TObject);
+        procedure DeleteStudentBTNClick(Sender: TObject);
+        procedure AddStudentBTNClick(Sender: TObject);
+        procedure FillStudentList;
+        procedure UpdateJournal;
+        procedure HelpBTNClick(Sender: TObject);
+    private
+        LessonsList: TList<String>;
+        NeedSave: Boolean;
+        StudentList: TList<TStudent>;
+    public
+        ClassName: String;
+    end;
 
 var
-  EditClassForm: TEditClassForm;
+    EditClassForm: TEditClassForm;
 
 implementation
 
@@ -115,39 +115,45 @@ end;
 
 procedure TEditClassForm.UpdateJournal;
 var
-    LetterNumber, JournalDir: String;
+    LetterNumber, JournalDir, LessonDir: String;
     I, J: Integer;
     NotesFile, LessonsFile: TextFile;
 begin
     LetterNumber := ClassName;
     LetterNumber := LetterNumber.ToUpper;
     JournalDir := 'common/classes/' + ClassName + '/journal';
-    CreateDir(JournalDir);
-    CreateDir(JournalDir + '/1');
-    CreateDir(JournalDir + '/2');
-    CreateDir(JournalDir + '/3');
-    CreateDir(JournalDir + '/4');
+    if not DirectoryExists(JournalDir) then
+    begin
+        CreateDir(JournalDir);
+        CreateDir(JournalDir + '/1');
+        CreateDir(JournalDir + '/2');
+        CreateDir(JournalDir + '/3');
+        CreateDir(JournalDir + '/4');
+    end;
     for J := 1 to 4 do
         for I := 0 to ComponentCount - 1 do
             if Components[I] is TCheckBox then
                 if (Components[I] as TCheckBox).Checked then
                 begin
-                    CreateDir(JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption);
-                    AssignFile(NotesFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/notes.notes');
-                    Rewrite(NotesFile);
-                    Write(NotesFile, '');
-                    CloseFile(NotesFile);
+                    LessonDir := JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption;
+                    if not DirectoryExists(LessonDir) then
+                    begin
+                        CreateDir(LessonDir);
+                        AssignFile(NotesFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/notes.notes');
+                        Rewrite(NotesFile);
+                        Write(NotesFile, '');
+                        CloseFile(NotesFile);
 
-                    CreateDir(JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption);
-                    AssignFile(NotesFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/quater.notes');
-                    Rewrite(NotesFile);
-                    Write(NotesFile, '');
-                    CloseFile(NotesFile);
+                        AssignFile(NotesFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/quater.notes');
+                        Rewrite(NotesFile);
+                        Write(NotesFile, '');
+                        CloseFile(NotesFile);
 
-                    AssignFile(LessonsFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/lessons.lessons');
-                    Rewrite(LessonsFile);
-                    Write(LessonsFile, '');
-                    CloseFile(LessonsFile);
+                        AssignFile(LessonsFile, JournalDir + '/' + IntToStr(J) + '/' + (Components[I] as TCheckBox).Caption + '/lessons.lessons');
+                        Rewrite(LessonsFile);
+                        Write(LessonsFile, '');
+                        CloseFile(LessonsFile);
+                    end;
                 end;
 end;
 
@@ -158,23 +164,32 @@ var
     I: Integer;
     Student: TStudent;
 begin
-    NeedSave := false;
-    SaveClassBtn.Enabled := NeedSave;
-    AssignFile(LessonsFile, 'common/classes/' + ClassName + '/lessons.lessons');
-    rewrite(LessonsFile);
-    for I := 0 to ComponentCount - 1 do
-        if Components[I] is TCheckBox then
-            if (Components[I] as TCheckBox).Checked then
-                Writeln(LessonsFile, (Components[I] as TCheckBox).Caption);
-    CloseFile(LessonsFile);
+    try
+        NeedSave := false;
+        SaveClassBtn.Enabled := NeedSave;
+        AssignFile(LessonsFile, 'common/classes/' + ClassName + '/lessons.lessons');
+        rewrite(LessonsFile);
+        for I := 0 to ComponentCount - 1 do
+            if Components[I] is TCheckBox then
+                if (Components[I] as TCheckBox).Checked then
+                    Writeln(LessonsFile, (Components[I] as TCheckBox).Caption);
+        CloseFile(LessonsFile);
+    except
+        MessageBox(Application.Handle, 'Не удается получить доступ к файлу изучаемых уроков. Данные сохранены не будут.', 'Редактирование класса', MB_ICONERROR);
+    end;
+
     UpdateJournal;
 
-    StudentList.Sort(Comparer);
-    AssignFile(StudentsFile, 'common/classes/' + ClassName + '/students.students');
-    Rewrite(StudentsFile);
-    for Student in StudentList do
-        Write(StudentsFile, Student);
-    CloseFile(StudentsFile);
+    try
+        StudentList.Sort(Comparer);
+        AssignFile(StudentsFile, 'common/classes/' + ClassName + '/students.students');
+        Rewrite(StudentsFile);
+        for Student in StudentList do
+            Write(StudentsFile, Student);
+        CloseFile(StudentsFile);
+    except
+        MessageBox(Application.Handle, 'Не удается получить доступ к файлу учеников. Данные сохранены не будут', 'Редактирование класса', MB_ICONERROR);
+    end;
 end;
 
 procedure TEditClassForm.DeleteClassInfo;
@@ -354,6 +369,5 @@ begin
         MessageBox(Application.Handle, 'Информация сохранена.', 'Редактирование класса', MB_ICONINFORMATION);
     end;
 end;
-
 
 end.

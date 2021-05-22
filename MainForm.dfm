@@ -5,7 +5,7 @@ object BaseForm: TBaseForm
   BorderStyle = bsSingle
   Caption = #1069#1083#1077#1082#1090#1088#1086#1085#1085#1099#1081' '#1078#1091#1088#1085#1072#1083
   ClientHeight = 431
-  ClientWidth = 378
+  ClientWidth = 380
   Color = clWindow
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -3246,9 +3246,9 @@ object BaseForm: TBaseForm
   PixelsPerInch = 96
   TextHeight = 13
   object Image1: TImage
-    Left = 0
+    Left = 8
     Top = 8
-    Width = 386
+    Width = 362
     Height = 192
     Center = True
     Enabled = False
@@ -3528,12 +3528,16 @@ object BaseForm: TBaseForm
     OnClick = EditClassClick
   end
   object MainMenu1: TMainMenu
-    Left = 208
-    Top = 296
+    Left = 416
+    Top = 264
     object HelpBTN: TMenuItem
       Caption = #1057#1087#1088#1072#1074#1082#1072
       ShortCut = 112
       OnClick = HelpBTNClick
+    end
+    object N1: TMenuItem
+      Caption = #1054#1073' '#1072#1074#1090#1086#1088#1077
+      OnClick = N1Click
     end
   end
 end
